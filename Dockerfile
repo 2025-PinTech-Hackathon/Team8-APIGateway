@@ -8,6 +8,11 @@ COPY . .
 
 RUN go build -o api-gateway cmd/api-gateway/main.go
 
+# TESTER
+FROM builder AS tester
+
+RUN go test -v ./...
+
 # RUNNER
 FROM alpine:latest
 COPY --from=builder /app/api-gateway /api-gateway
