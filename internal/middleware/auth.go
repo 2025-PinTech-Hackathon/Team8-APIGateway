@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"api-gateway/internal/auth"
+	"os"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
@@ -18,6 +19,14 @@ func JWTAuthMiddleware() fiber.Handler {
 		// OPTIONS 메서드는 인증 없이 통과
 		if c.Method() == fiber.MethodOptions {
 			return c.Next()
+		}
+
+		// Swagger UI 접근 허용 설정이 활성화된 경우
+		if os.Getenv("ENABLE_SWAGGER_PASS") == "true" {
+			path := c.Path()
+			if strings.HasPrefix(path, "/docs") || path == "/openapi.json" {
+				return c.Next()
+			}
 		}
 
 		// Authorization 헤더 확인
